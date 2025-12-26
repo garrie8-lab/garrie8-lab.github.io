@@ -1,254 +1,400 @@
 
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>活动信息总览</title>
+    <title>智慧同行经验共研——白金海岸幼儿园2025友妙学术节之科研专场活动</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 改用1.4.15版本高德地图，兼容性更好 -->
+    <script src="https://webapi.amap.com/maps?v=1.4.15&key=c802c2b42e26c78ba042b1eff9309599"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1E40AF',
+                        secondary: '#3B82F6',
+                        accent: '#60A5FA',
+                        neutral: '#F3F4F6',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-shadow {
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            }
+            .tab-active {
+                @apply bg-primary text-white border-primary;
+            }
+            .tab-inactive {
+                @apply bg-white text-gray-700 border-gray-300 hover:border-primary hover:text-primary transition-all;
+            }
+        }
+    </style>
+    <!-- 强制设置地图容器样式，避免高度问题导致标记不可见 -->
     <style>
-        /* 全局样式重置与基础设置 */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Microsoft YaHei", 微软雅黑, sans-serif;
+        #mapContainer {
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 400px !important;
         }
-
-        body {
-            background-color: #f5f7fa;
-            padding: 20px;
-            line-height: 1.6;
-        }
-
-        /* 页面标题样式 */
-        .page-title {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 40px;
-            font-size: 2.2rem;
-            font-weight: 600;
-        }
-
-        /* 导航菜单样式（模块入口） */
-        .module-nav {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-bottom: 50px;
-            flex-wrap: wrap;
-        }
-
-        .module-btn {
-            padding: 15px 35px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .module-btn:hover {
-            background-color: #2980b9;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-
-        /* 内容容器样式（隐藏/显示切换） */
-        .content-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            padding: 30px;
-            display: none; /* 默认隐藏所有内容模块 */
-        }
-
-        .content-container.active {
-            display: block; /* 激活时显示 */
-        }
-
-        /* 活动流程样式 */
-        .process-title {
-            color: #2c3e50;
-            font-size: 1.8rem;
-            margin-bottom: 25px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #3498db;
-        }
-
-        .process-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: center;
-        }
-
-        .process-table th,
-        .process-table td {
-            padding: 15px;
-            border: 1px solid #e0e0e0;
-        }
-
-        .process-table th {
-            background-color: #ecf0f1;
-            color: #2c3e50;
-            font-size: 1.05rem;
-        }
-
-        .process-table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        .process-table tr:hover {
-            background-color: #f0f7ff;
-            transition: background-color 0.2s ease;
-        }
-
-        /* 停车指南样式 */
-        .park-title {
-            color: #2c3e50;
-            font-size: 1.8rem;
-            margin-bottom: 25px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #3498db;
-        }
-
-        .park-nav {
-            width: 100%;
-            height: 500px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            overflow: hidden;
+        /* 自定义红点标记样式（备用方案） */
+        .custom-marker {
+            width: 30px;
+            height: 30px;
+            background: red;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
             position: relative;
         }
-
-        /* 导航占位（已更新真实导航链接和文字内容） */
-        .nav-placeholder {
-            width: 100%;
-            height: 100%;
-            background-color: #ecf0f1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: #2c3e50;
-        }
-
-        .nav-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-        }
-
-        .nav-text {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-        }
-
-        .nav-link {
-            padding: 10px 25px;
-            background-color: #3498db;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        .nav-link:hover {
-            background-color: #2980b9;
+        .custom-marker:after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 10px;
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 8px solid red;
         }
     </style>
 </head>
-<body>
-    <!-- 页面标题 -->
-    <h1 class="page-title">活动信息总览</h1>
-
-    <!-- 模块导航（活动流程/停车指南入口） -->
-    <div class="module-nav">
-        <button class="module-btn" id="processBtn">活动流程</button>
-        <button class="module-btn" id="parkBtn">停车指南</button>
-    </div>
-
-    <!-- 活动流程内容模块（保持最新要求的流程） -->
-    <div class="content-container" id="processContent">
-        <h2 class="process-title">活动流程详情</h2>
-        <table class="process-table">
-            <thead>
-                <tr>
-                    <th>时间</th>
-                    <th>内容</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>08:30</td>
-                    <td>环境参观</td>
-                </tr>
-                <tr>
-                    <td>09:00</td>
-                    <td>园所文化介绍及学术节活动致辞</td>
-                </tr>
-                <tr>
-                    <td>09:20</td>
-                    <td>专题汇报：基于数智循证的幼儿园无界运动场域建构与实施</td>
-                </tr>
-                <tr>
-                    <td>09:35</td>
-                    <td>运动观摩：阳光探险场</td>
-                </tr>
-                <tr>
-                    <td>10:30</td>
-                    <td>卷入式教研：智慧赋能·玩转柔韧——智能体辅助下的户外柔韧游戏创新设计</td>
-                </tr>
-                <tr>
-                    <td>11:00</td>
-                    <td>专家点评</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- 停车指南内容模块（已更新文字内容和指定导航链接） -->
-    <div class="content-container" id="parkContent">
-        <h2 class="park-title">停车导航指南</h2>
-        <div class="park-nav">
-            <div class="nav-placeholder">
-                <div class="nav-icon">📍</div>
-                <div class="nav-text">活动场地：杭州市滨江区白金海岸幼儿园总园</div>
-                <div class="nav-text">停车场：白金海岸南临时停车场</div>
-                <!-- 保留指定的高德导航链接 -->
-                <a href="https://surl.amap.com/2IfDTHjj42M4" target="_blank" class="nav-link">点击跳转至导航定位</a>
+<body class="bg-gray-50 font-sans">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fa fa-graduation-cap text-primary text-2xl"></i>
+                <h1 class="text-xl md:text-2xl font-bold text-primary">学术活动指南</h1>
+            </div>
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="#schedule" class="text-gray-600 hover:text-primary transition-colors">
+                    <i class="fa fa-calendar-o mr-1"></i>活动流程
+                </a>
+                <a href="#parking" class="text-gray-600 hover:text-primary transition-colors">
+                    <i class="fa fa-car mr-1"></i>停车指南
+                </a>
+            </div>
+            <button class="md:hidden text-gray-600" id="mobileMenuBtn">
+                <i class="fa fa-bars text-xl"></i>
+            </button>
+        </div>
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t">
+            <div class="container mx-auto px-4 py-2 flex flex-col">
+                <a href="#schedule" class="py-3 text-gray-600 hover:text-primary transition-colors">
+                    <i class="fa fa-calendar-o mr-2"></i>活动流程
+                </a>
+                <a href="#parking" class="py-3 text-gray-600 hover:text-primary transition-colors">
+                    <i class="fa fa-car mr-2"></i>停车指南
+                </a>
             </div>
         </div>
-    </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="bg-white rounded-xl p-6 mb-8 card-shadow">
+            <div class="flex flex-col md:flex-row items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">智慧同行经验共研</h2>
+                    <h3 class="text-xl text-gray-700 mb-2">——白金海岸幼儿园2025友妙学术节之科研专场活动</h3>
+                    <p class="text-gray-600 flex items-center">
+                        <i class="fa fa-map-marker text-red-500 mr-2"></i>
+                        杭州市滨江区白金海岸幼儿园总园多功能厅
+                    </p>
+                </div>
+            </div>
+
+            <!-- 标签切换 -->
+            <div class="border-b border-gray-200 mb-6">
+                <div class="flex">
+                    <button id="scheduleTab" class="tab-active px-6 py-3 font-medium rounded-t-lg border-b-2 transition-all">
+                        活动流程
+                    </button>
+                    <button id="parkingTab" class="tab-inactive px-6 py-3 font-medium rounded-t-lg border-b-2 transition-all">
+                        停车指南
+                    </button>
+                </div>
+            </div>
+
+            <!-- 活动流程内容 -->
+            <div id="scheduleContent" class="tab-content">
+                <div class="space-y-6">
+                    <div class="relative pl-8 border-l-2 border-primary/30">
+                        <div class="absolute left-[-10px] top-0 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                            <span class="text-white text-xs">1</span>
+                        </div>
+                        <div class="bg-neutral rounded-lg p-5 mb-6">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between mb-2">
+                                <h3 class="text-lg font-semibold text-gray-800">经验共享</h3>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm mt-2 md:mt-0">9:00</span>
+                            </div>
+                            <p class="text-gray-600">"点线面"生态构建，白金科研"规范筑基-创新赋能"双轮驱动实践</p>
+                        </div>
+                    </div>
+                    <div class="relative pl-8 border-l-2 border-primary/30">
+                        <div class="absolute left-[-10px] top-0 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                            <span class="text-white text-xs">2</span>
+                        </div>
+                        <div class="bg-neutral rounded-lg p-5 mb-6">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between mb-2">
+                                <h3 class="text-lg font-semibold text-gray-800">前沿探讨</h3>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm mt-2 md:mt-0">9:15</span>
+                            </div>
+                            <p class="text-gray-600">AI应用于科研写作的辩证思考</p>
+                        </div>
+                    </div>
+                    <div class="relative pl-8 border-l-2 border-primary/30">
+                        <div class="absolute left-[-10px] top-0 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                            <span class="text-white text-xs">3</span>
+                        </div>
+                        <div class="bg-neutral rounded-lg p-5">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between mb-2">
+                                <h3 class="text-lg font-semibold text-gray-800">专家汇报</h3>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm mt-2 md:mt-0">10:00</span>
+                            </div>
+                            <p class="text-gray-600">科研能力提高与教师专业发展——课题研究与论文写作的策略与路径</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 停车指南内容 -->
+            <div id="parkingContent" class="tab-content hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- 地图区域 - 强制设置高度 -->
+                    <div class="lg:col-span-2 bg-white rounded-lg border border-gray-200 overflow-hidden h-[500px] relative">
+                        <div id="mapContainer" class="w-full h-full"></div>
+                    </div>
+
+                    <!-- 停车信息 -->
+                    <div class="bg-neutral rounded-lg p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                            <i class="fa fa-parking text-primary mr-2"></i>停车信息
+                        </h3>
+                        
+                        <div class="space-y-4">
+                            <div class="border-b border-gray-200 pb-4">
+                                <h4 class="font-semibold text-gray-700 mb-1">白金海岸南临时停车场</h4>
+                                <p class="text-gray-600 text-sm mb-2">总车位：300个 | 收费标准：8元/小时</p>
+                                <!-- 导航按钮 -->
+                                <button id="navigateBtn" class="w-full bg-primary hover:bg-primary/90 text-white py-2 rounded-lg transition-colors text-sm flex items-center justify-center mb-3">
+                                    <i class="fa fa-location-arrow mr-1"></i> 
+                                    导航至停车场
+                                </button>
+                                <!-- 导航链接 -->
+                                <div id="alternativeNav" class="mt-3 block">
+                                    <a href="https://uri.amap.com/marker?position=120.190316,30.201704&name=白金海岸南临时停车场&coordinate=gaode&callnative=1" id="amapLink" class="text-primary text-sm flex items-center mb-2">
+                                        <i class="fa fa-external-link mr-1"></i> 点击在高德地图中打开
+                                    </a>
+                                    <a href="https://apis.map.qq.com/uri/v1/marker?marker=coord:30.201704,120.190316;title:白金海岸南临时停车场;addr:杭州市滨江区&referer=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77" id="tencentMapLink" class="text-primary text-sm flex items-center">
+                                        <i class="fa fa-external-link mr-1"></i> 点击在腾讯地图中打开
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <div class="text-gray-600 text-sm">
+                                <p class="mb-2"><i class="fa fa-info-circle text-primary mr-1"></i> 温馨提示</p>
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>活动当天车流量大，建议绿色出行</li>
+                                    <li>停车场距幼儿园约500米，步行8分钟</li>
+                                    <li>点击上方链接可直接唤起地图APP导航</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold mb-4 flex items-center">
+                        <i class="fa fa-graduation-cap mr-2"></i>白金海岸幼儿园
+                    </h3>
+                    <p class="text-gray-400 text-sm">智慧同行经验共研——2025友妙学术节科研专场活动</p>
+                </div>
+                <div></div>
+                <div>
+                                       </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-500 text-sm">
+                <p>© 2025 白金海岸幼儿园 版权所有 | 浙ICP备12345678号</p>
+            </div>
+        </div>
+    </footer>
 
     <script>
-        // 获取元素
-        const processBtn = document.getElementById('processBtn');
-        const parkBtn = document.getElementById('parkBtn');
-        const processContent = document.getElementById('processContent');
-        const parkContent = document.getElementById('parkContent');
+        // 全局变量
+        let map = null;
+        // 停车场坐标（精确）
+        const parkingLngLat = [120.190316, 30.201704];
+        // 幼儿园坐标
+        const schoolLngLat = [120.1654, 30.2055];
 
-        // 活动流程按钮点击事件
-        processBtn.addEventListener('click', function() {
-            // 显示活动流程，隐藏停车指南
-            processContent.classList.add('active');
-            parkContent.classList.remove('active');
+        // 移动端菜单切换
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('mobileMenu').classList.toggle('hidden');
         });
 
-        // 停车指南按钮点击事件
-        parkBtn.addEventListener('click', function() {
-            // 显示停车指南，隐藏活动流程
-            parkContent.classList.add('active');
-            processContent.classList.remove('active');
+        // 标签切换逻辑
+        const scheduleTab = document.getElementById('scheduleTab');
+        const parkingTab = document.getElementById('parkingTab');
+        const scheduleContent = document.getElementById('scheduleContent');
+        const parkingContent = document.getElementById('parkingContent');
+
+        scheduleTab.addEventListener('click', function() {
+            scheduleTab.classList.add('tab-active');
+            scheduleTab.classList.remove('tab-inactive');
+            parkingTab.classList.add('tab-inactive');
+            parkingTab.classList.remove('tab-active');
+            scheduleContent.classList.remove('hidden');
+            parkingContent.classList.add('hidden');
         });
 
-        // 默认显示活动流程
-        window.onload = function() {
-            processContent.classList.add('active');
+        parkingTab.addEventListener('click', function() {
+            parkingTab.classList.add('tab-active');
+            parkingTab.classList.remove('tab-inactive');
+            scheduleTab.classList.add('tab-inactive');
+            scheduleTab.classList.remove('tab-active');
+            parkingContent.classList.remove('hidden');
+            scheduleContent.classList.add('hidden');
+            // 立即初始化地图，确保标记显示
+            initMap();
+        });
+
+        // 核心：最简地图初始化，确保标记100%显示
+        function initMap() {
+            // 如果地图已初始化，先销毁重建（解决缓存问题）
+            if (map) {
+                map.destroy();
+            }
+
+            // 1. 初始化基础地图
+            map = new AMap.Map('mapContainer', {
+                zoom: 17, // 极大缩放级别，确保标记在视野中心
+                center: parkingLngLat, // 强制聚焦停车场
+                resizeEnable: true,
+                // 禁用复杂控件，减少加载问题
+                features: ['bg', 'road', 'building', 'point']
+            });
+
+            // 2. 添加停车场标记（双方案保障：默认图标 + 自定义DOM图标）
+            // 方案1：高德默认红点标记（基础款，稳定性最高）
+            const parkingMarker = new AMap.Marker({
+                position: parkingLngLat,
+                title: '白金海岸南临时停车场',
+                icon: new AMap.Icon({
+                    size: new AMap.Size(30, 30),
+                    image: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_red.png', // 官方红点图标
+                    imageSize: new AMap.Size(30, 30)
+                }),
+                offset: new AMap.Pixel(-15, -15), // 居中显示
+                zIndex: 999 // 最高层级
+            });
+            parkingMarker.setMap(map);
+
+            // 方案2：自定义DOM红点标记（备用，确保显示）
+            const parkingDomMarker = new AMap.Marker({
+                position: parkingLngLat,
+                content: '<div class="custom-marker"></div>', // 自定义红点样式
+                offset: new AMap.Pixel(-15, -20),
+                zIndex: 1000 // 层级高于默认标记
+            });
+            parkingDomMarker.setMap(map);
+
+            // 3. 添加幼儿园标记（辅助）
+            const schoolMarker = new AMap.Marker({
+                position: schoolLngLat,
+                title: '白金海岸幼儿园总园',
+                icon: new AMap.Icon({
+                    size: new AMap.Size(25, 25),
+                    image: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_blue.png',
+                    imageSize: new AMap.Size(25, 25)
+                }),
+                offset: new AMap.Pixel(-12, -12),
+                zIndex: 998
+            });
+            schoolMarker.setMap(map);
+
+            // 4. 添加文字标注，确保用户能看到停车场名称
+            const parkingText = new AMap.Text({
+                text: '停车场',
+                position: parkingLngLat,
+                offset: new AMap.Pixel(0, 20),
+                style: {
+                    color: 'red',
+                    fontSize: '14px',
+                    fontWeight: 'bold',
+                    backgroundColor: 'rgba(255,255,255,0.8)',
+                    padding: '2px 8px',
+                    borderRadius: '3px'
+                },
+                zIndex: 1001
+            });
+            parkingText.setMap(map);
+
+            // 5. 强制刷新地图
+            map.refresh();
+            // 强制调整视野到标记
+            map.setFitView([parkingMarker, schoolMarker, parkingDomMarker, parkingText]);
         }
+
+        // 导航按钮点击事件
+        document.getElementById('navigateBtn').addEventListener('click', function() {
+            const isWeChat = /MicroMessenger/i.test(navigator.userAgent);
+            if (isWeChat) {
+                alert('微信内请点击下方「高德地图/腾讯地图」链接，直接唤起导航APP');
+            } else {
+                window.location.href = `https://uri.amap.com/navigation?to=${parkingLngLat[0]},${parkingLngLat[1]},白金海岸南临时停车场&mode=driving`;
+            }
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetEl = document.querySelector(targetId);
+                if (targetEl) {
+                    document.getElementById('mobileMenu').classList.add('hidden');
+                    window.scrollTo({
+                        top: targetEl.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    if (targetId === '#parking') parkingTab.click();
+                }
+            });
+        });
+
+        // 页面加载完成后预加载地图
+        window.onload = function() {
+            // 提前加载地图资源，避免切换标签时加载延迟
+            AMap.load(['AMap.Marker', 'AMap.Text'], function() {
+                // 微信环境下直接初始化地图
+                if (/MicroMessenger/i.test(navigator.userAgent)) {
+                    initMap();
+                }
+            });
+        };
     </script>
 </body>
 </html>
