@@ -1,0 +1,424 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>乐创生活 互动深耕——白金海岸幼儿园2025友妙学术节之音乐教学专场活动</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 改用1.4.15版本高德地图，兼容性更好 -->
+    <script src="https://webapi.amap.com/maps?v=1.4.15&key=c802c2b42e26c78ba042b1eff9309599"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#8d1514',
+                        secondary: '#a17665',
+                        accent: '#341407',
+                        neutral: '#F3F4F6',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-shadow {
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            }
+            .tab-active {
+                @apply bg-primary text-white border-primary;
+            }
+            .tab-inactive {
+                @apply bg-white text-gray-700 border-gray-300 hover:border-primary hover:text-primary transition-all;
+            }
+        }
+    </style>
+    <!-- 强制设置地图容器样式，避免高度问题导致标记不可见 -->
+    <style>
+        #mapContainer {
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 400px !important;
+        }
+        /* 自定义红点标记样式（备用方案） */
+        .custom-marker {
+            width: 30px;
+            height: 30px;
+            background: red;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .custom-marker:after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 10px;
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 8px solid red;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fa fa-graduation-cap text-primary text-2xl"></i>
+                <h1 class="text-xl md:text-2xl font-bold text-primary">学术活动指南</h1>
+            </div>
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="#schedule" class="text-gray-600 hover:text-primary transition-colors">
+                    <i class="fa fa-calendar-o mr-1"></i>活动流程
+                </a>
+                <a href="#parking" class="text-gray-600 hover:text-primary transition-colors">
+                    <i class="fa fa-car mr-1"></i>停车指南
+                </a>
+            </div>
+            <button class="md:hidden text-gray-600" id="mobileMenuBtn">
+                <i class="fa fa-bars text-xl"></i>
+            </button>
+        </div>
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t">
+            <div class="container mx-auto px-4 py-2 flex flex-col">
+                <a href="#schedule" class="py-3 text-gray-600 hover:text-primary transition-colors">
+                    <i class="fa fa-calendar-o mr-2"></i>活动流程
+                </a>
+                <a href="#parking" class="py-3 text-gray-600 hover:text-primary transition-colors">
+                    <i class="fa fa-car mr-2"></i>停车指南
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="bg-white rounded-xl p-6 mb-8 card-shadow">
+            <div class="flex flex-col md:flex-row items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">乐创生活 互动深耕</h2>
+                    <h3 class="text-xl text-gray-700 mb-2">——白金海岸幼儿园2025友妙学术节之音乐教育专场活动</h3>
+                    <p class="text-gray-600 flex items-center">
+                        <i class="fa fa-map-marker text-red-500 mr-2"></i>
+                        杭州市滨江区闻涛幼儿园多功能厅
+                    </p>
+                </div>
+            </div>
+
+            <!-- 标签切换 -->
+            <div class="border-b border-gray-200 mb-6">
+                <div class="flex">
+                    <button id="scheduleTab" class="tab-active px-6 py-3 font-medium rounded-t-lg border-b-2 transition-all">
+                        活动流程
+                    </button>
+                    <button id="parkingTab" class="tab-inactive px-6 py-3 font-medium rounded-t-lg border-b-2 transition-all">
+                        停车指南
+                    </button>
+                </div>
+            </div>
+
+            <!-- 活动流程内容（调整后） -->
+            <div id="scheduleContent" class="tab-content">
+                <div class="space-y-6">
+                    <!-- 环节1：8:30-9:00 环境参观  -->
+                    <div class="relative pl-8 border-l-2 border-primary/30">
+                        <div class="absolute left-[-10px] top-0 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                            <span class="text-white text-xs">1</span>
+                        </div>
+                        <div class="bg-neutral rounded-lg p-5 mb-6">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between mb-2">
+                                <h3 class="text-lg font-semibold text-gray-800"> 环境参观</h3>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm mt-2 md:mt-0">8:30-9:00</span>
+                            </div>
+                            <div class="pl-4 mt-2 space-y-2 text-gray-700">
+                                <p>勇敢趣动场/友妙工作坊</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 环节2：9:00-10:30 教学展示 -->
+                    <div class="relative pl-8 border-l-2 border-primary/30">
+                        <div class="absolute left-[-10px] top-0 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                            <span class="text-white text-xs">2</span>
+                        </div>
+                        <div class="bg-neutral rounded-lg p-5 mb-6">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between mb-2">
+                                <h3 class="text-lg font-semibold text-gray-800">教学展示</h3>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm mt-2 md:mt-0">9:00-10:30</span>
+                            </div>
+                            <div class="pl-4 mt-2 space-y-2 text-gray-700">
+                                <p>中班《动物音乐会》 余格格</p>
+                                <p>大班《茉莉花》 袁方</p>
+                                <p>中班《鱼儿日记》 汪可儿</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 环节3：10:30-11:00 师幼互动教学评价 -->
+                    <div class="relative pl-8 border-l-2 border-primary/30">
+                        <div class="absolute left-[-10px] top-0 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                            <span class="text-white text-xs">3</span>
+                        </div>
+                        <div class="bg-neutral rounded-lg p-5 mb-6">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between mb-2">
+                                <h3 class="text-lg font-semibold text-gray-800">师幼互动教学评价</h3>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm mt-2 md:mt-0">10:30-11:00</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 环节4：11:00-11:30 专家点评 -->
+                    <div class="relative pl-8 border-l-2 border-primary/30">
+                        <div class="absolute left-[-10px] top-0 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                            <span class="text-white text-xs">4</span>
+                        </div>
+                        <div class="bg-neutral rounded-lg p-5">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between mb-2">
+                                <h3 class="text-lg font-semibold text-gray-800">专家点评</h3>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm mt-2 md:mt-0">11:00-11:30</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 停车指南内容（无修改） -->
+            <div id="parkingContent" class="tab-content hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- 地图区域 - 强制设置高度 -->
+                    <div class="lg:col-span-2 bg-white rounded-lg border border-gray-200 overflow-hidden h-[500px] relative">
+                        <div id="mapContainer" class="w-full h-full"></div>
+                    </div>
+
+                    <!-- 停车信息 -->
+<div class="bg-neutral rounded-lg p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                            <i class="fa fa-parking text-primary mr-2"></i>停车信息
+                        </h3>
+                        
+                        <div class="space-y-4">
+                            <div class="border-b border-gray-200 pb-4">
+                                <h4 class="font-semibold text-gray-700 mb-1">白金海岸南临时停车场</h4>
+                                <p class="text-gray-600 text-sm mb-2">总车位：300个 | 收费标准：8元/小时</p>
+                                <!-- 导航按钮 -->
+                                <button id="navigateBtn" class="w-full bg-primary hover:bg-primary/90 text-white py-2 rounded-lg transition-colors text-sm flex items-center justify-center mb-3">
+                                    <i class="fa fa-location-arrow mr-1"></i> 
+                                    导航至停车场
+                                </button>
+                                <!-- 导航链接 -->
+                                <div id="alternativeNav" class="mt-3 block">
+                                    <a href="https://uri.amap.com/marker?position=120.190316,30.201704&name=白金海岸南临时停车场&coordinate=gaode&callnative=1" id="amapLink" class="text-primary text-sm flex items-center mb-2">
+                                        <i class="fa fa-external-link mr-1"></i> 点击在高德地图中打开
+                                    </a>
+                                    <a href="https://apis.map.qq.com/uri/v1/marker?marker=coord:30.201704,120.190316;title:白金海岸南临时停车场;addr:杭州市滨江区&referer=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77" id="tencentMapLink" class="text-primary text-sm flex items-center">
+                                        <i class="fa fa-external-link mr-1"></i> 点击在腾讯地图中打开
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <div class="text-gray-600 text-sm">
+                                <p class="mb-2"><i class="fa fa-info-circle text-primary mr-1"></i> 温馨提示</p>
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>小区内车位紧张，建议绿色出行</li>
+                                    <li>点击上方链接可直接唤起地图APP导航</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚（无修改） -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold mb-4 flex items-center">
+                        <i class="fa fa-graduation-cap mr-2"></i>白金海岸幼儿园
+                    </h3>
+                    <p class="text-gray-400 text-sm">乐创生活 互动深耕——2025友妙学术节音乐教学专场活动</p>
+                </div>
+                <div></div>
+                <div>
+                                       </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-500 text-sm">
+                <p>© 2025 白金海岸幼儿园 版权所有 | 浙ICP备12345678号</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 全局变量
+        let map = null;
+        // 停车场坐标（精确）
+        const parkingLngLat = [120.190316, 30.201704];
+        // 幼儿园坐标
+        const schoolLngLat = [120.189027,30.200832];
+
+        // 移动端菜单切换
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('mobileMenu').classList.toggle('hidden');
+        });
+
+        // 标签切换逻辑
+        const scheduleTab = document.getElementById('scheduleTab');
+        const parkingTab = document.getElementById('parkingTab');
+        const scheduleContent = document.getElementById('scheduleContent');
+        const parkingContent = document.getElementById('parkingContent');
+
+        scheduleTab.addEventListener('click', function() {
+            scheduleTab.classList.add('tab-active');
+            scheduleTab.classList.remove('tab-inactive');
+            parkingTab.classList.add('tab-inactive');
+            parkingTab.classList.remove('tab-active');
+            scheduleContent.classList.remove('hidden');
+            parkingContent.classList.add('hidden');
+        });
+
+        parkingTab.addEventListener('click', function() {
+            parkingTab.classList.add('tab-active');
+            parkingTab.classList.remove('tab-inactive');
+            scheduleTab.classList.add('tab-inactive');
+            scheduleTab.classList.remove('tab-active');
+            parkingContent.classList.remove('hidden');
+            scheduleContent.classList.add('hidden');
+            // 立即初始化地图，确保标记显示
+            initMap();
+        });
+
+        // 核心：最简地图初始化，确保标记100%显示
+        function initMap() {
+            // 如果地图已初始化，先销毁重建（解决缓存问题）
+            if (map) {
+                map.destroy();
+            }
+
+            // 1. 初始化基础地图
+            map = new AMap.Map('mapContainer', {
+                zoom: 17, // 极大缩放级别，确保标记在视野中心
+                center: parkingLngLat, // 强制聚焦停车场
+                resizeEnable: true,
+                // 禁用复杂控件，减少加载问题
+                features: ['bg', 'road', 'building', 'point']
+            });
+
+            // 2. 添加停车场标记（双方案保障：默认图标 + 自定义DOM图标）
+            // 方案1：高德默认红点标记（基础款，稳定性最高）
+            const parkingMarker = new AMap.Marker({
+                position: parkingLngLat,
+                title: '白金海岸南停车场',
+                icon: new AMap.Icon({
+                    size: new AMap.Size(30, 30),
+                    image: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_red.png', // 官方红点图标
+                    imageSize: new AMap.Size(30, 30)
+                }),
+                offset: new AMap.Pixel(-15, -15), // 居中显示
+                zIndex: 999 // 最高层级
+            });
+            parkingMarker.setMap(map);
+
+            // 方案2：自定义DOM红点标记（备用，确保显示）
+            const parkingDomMarker = new AMap.Marker({
+                position: parkingLngLat,
+                content: '<div class="custom-marker"></div>', // 自定义红点样式
+                offset: new AMap.Pixel(-15, -20),
+                zIndex: 1000 // 层级高于默认标记
+            });
+            parkingDomMarker.setMap(map);
+
+            // 3. 添加幼儿园标记（辅助）
+            const schoolMarker = new AMap.Marker({
+                position: schoolLngLat,
+                title: '闻涛幼儿园',
+                icon: new AMap.Icon({
+                    size: new AMap.Size(25, 25),
+                    image: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_blue.png',
+                    imageSize: new AMap.Size(25, 25)
+                }),
+                offset: new AMap.Pixel(-12, -12),
+                zIndex: 998
+            });
+            schoolMarker.setMap(map);
+
+            // 4. 添加文字标注，确保用户能看到停车场名称
+            const parkingText = new AMap.Text({
+                text: '停车场',
+                position: parkingLngLat,
+                offset: new AMap.Pixel(0, 20),
+                style: {
+                    color: 'red',
+                    fontSize: '14px',
+                    fontWeight: 'bold',
+                    backgroundColor: 'rgba(255,255,255,0.8)',
+                    padding: '2px 8px',
+                    borderRadius: '3px'
+                },
+                zIndex: 1001
+            });
+            parkingText.setMap(map);
+
+            // 5. 强制刷新地图
+            map.refresh();
+            // 强制调整视野到标记
+            map.setFitView([parkingMarker, schoolMarker, parkingDomMarker, parkingText]);
+        }
+
+        // 导航按钮点击事件
+        document.getElementById('navigateBtn').addEventListener('click', function() {
+            const isWeChat = /MicroMessenger/i.test(navigator.userAgent);
+            if (isWeChat) {
+                alert('微信内请点击下方「高德地图/腾讯地图」链接，直接唤起导航APP');
+            } else {
+                window.location.href = `https://uri.amap.com/navigation?to=${parkingLngLat[0]},${parkingLngLat[1]},白金海岸南临时停车场&mode=driving`;
+            }
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetEl = document.querySelector(targetId);
+                if (targetEl) {
+                    document.getElementById('mobileMenu').classList.add('hidden');
+                    window.scrollTo({
+                        top: targetEl.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    if (targetId === '#parking') parkingTab.click();
+                }
+            });
+        });
+
+        // 页面加载完成后预加载地图
+        window.onload = function() {
+            // 提前加载地图资源，避免切换标签时加载延迟
+            AMap.load(['AMap.Marker', 'AMap.Text'], function() {
+                // 微信环境下直接初始化地图
+                if (/MicroMessenger/i.test(navigator.userAgent)) {
+                    initMap();
+                }
+            });
+        };
+    </script>
+</body>
+</html>
